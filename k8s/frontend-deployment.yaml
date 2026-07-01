@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: weather-frontend
-          image: ghcr.io/YOUR_GITHUB_USERNAME/weather-frontend:latest
+          image: ghcr.io/yangm111-pixel/weather-frontend:latest
           ports:
             - containerPort: 80
           readinessProbe:

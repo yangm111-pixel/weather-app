@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: weather-api
-          image: ghcr.io/YOUR_GITHUB_USERNAME/weather-api:latest
+          image: ghcr.io/yangm111-pixel/weather-api:latest
           ports:
             - containerPort: 3001
           env:
