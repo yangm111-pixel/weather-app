@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkyCheck</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0b0f1a;
+      --surface:   #131929;
+      --border:    #1e2d4a;
+      --accent:    #4fa3e0;
+      --accent2:   #a78bfa;
+      --text:      #e8edf5;
+      --muted:     #6b7a99;
+      --error:     #f87171;
+      --radius:    12px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 60px 20px 40px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .logo {
+      font-family: 'Space Mono', monospace;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .logo span {
+      color: var(--accent);
+    }
+
+    .tagline {
+      color: var(--muted);
+      font-size: 0.875rem;
+      margin-top: 6px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .search-wrapper {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      max-width: 480px;
+      margin-bottom: 40px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem;
+      padding: 14px 18px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]::placeholder { color: var(--muted); }
+    input[type="text"]:focus { border-color: var(--accent); }
+
+    button {
+      background: var(--accent);
+      border: none;
+      border-radius: var(--radius);
+      color: #0b0f1a;
+      cursor: pointer;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 14px 22px;
+      transition: opacity 0.2s;
+      white-space: nowrap;
+    }
+
+    button:hover { opacity: 0.85; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 480px;
+      padding: 32px;
+      display: none;
+    }
+
+    .card.visible { display: block; }
+
+    .city-name {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .country {
+      color: var(--muted);
+      font-size: 0.875rem;
+      margin-bottom: 28px;
+    }
+
+    .temp-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+
+    .temp-main {
+      font-family: 'Space Mono', monospace;
+      font-size: 4rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .weather-desc {
+      font-size: 1rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .feels-like {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .stat {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent2);
+    }
+
+    .error-msg {
+      color: var(--error);
+      font-size: 0.9rem;
+      text-align: center;
+      margin-top: 12px;
+      min-height: 20px;
+    }
+
+    .loading {
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-align: center;
+      margin-top: 12px;
+      min-height: 20px;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 28px 0;
+    }
+
+    footer {
+      margin-top: 60px;
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Sky<span>Check</span></div>
+    <p class="tagline">Cloud-native weather lookup</p>
+  </header>
+
+  <div class="search-wrapper">
+    <input type="text" id="cityInput" placeholder="Enter a city..." />
+    <button id="searchBtn" onclick="fetchWeather()">Search</button>
+  </div>
+
+  <div id="status" class="loading"></div>
+  <div id="errorMsg" class="error-msg"></div>
+
+  <div class="card" id="weatherCard">
+    <div class="city-name" id="cityName"></div>
+    <div class="country" id="countryName"></div>
+
+    <div class="temp-row">
+      <div class="temp-main" id="temperature"></div>
+    </div>
+    <div class="weather-desc" id="weatherDesc"></div>
+    <div class="feels-like" id="feelsLike"></div>
+
+    <hr class="divider" />
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">Humidity</div>
+        <div class="stat-value" id="humidity"></div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Wind Speed</div>
+        <div class="stat-value" id="windSpeed"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Data via Open-Meteo &mdash; no API key required</footer>
+
+  <script>
+    // Backend API URL — replaced at deploy time via env or defaults to localhost for local dev
+    const API_URL = window.ENV_API_URL || "http://localhost:3001";
+
+    const weatherDescriptions = {
+      0: "Clear sky", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast",
+      45: "Foggy", 48: "Icy fog",
+      51: "Light drizzle", 53: "Drizzle", 55: "Heavy drizzle",
+      61: "Light rain", 63: "Rain", 65: "Heavy rain",
+      71: "Light snow", 73: "Snow", 75: "Heavy snow", 77: "Snow grains",
+      80: "Light showers", 81: "Showers", 82: "Heavy showers",
+      85: "Snow showers", 86: "Heavy snow showers",
+      95: "Thunderstorm", 96: "Thunderstorm with hail", 99: "Heavy thunderstorm",
+    };
+
+    const input = document.getElementById("cityInput");
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") fetchWeather(); });
+
+    async function fetchWeather() {
+      const city = input.value.trim();
+      if (!city) return;
+
+      const btn = document.getElementById("searchBtn");
+      const card = document.getElementById("weatherCard");
+      const status = document.getElementById("status");
+      const errorMsg = document.getElementById("errorMsg");
+
+      btn.disabled = true;
+      card.classList.remove("visible");
+      errorMsg.textContent = "";
+      status.textContent = "Looking up weather...";
+
+      try {
+        const res = await fetch(`${API_URL}/weather?city=${encodeURIComponent(city)}`);
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.error || "Something went wrong");
+
+        document.getElementById("cityName").textContent = data.city;
+        document.getElementById("countryName").textContent = data.country;
+        document.getElementById("temperature").textContent = `${Math.round(data.temperature)}°F`;
+        document.getElementById("weatherDesc").textContent = weatherDescriptions[data.weather_code] || "Unknown";
+        document.getElementById("feelsLike").textContent = `Feels like ${Math.round(data.feels_like)}°F`;
+        document.getElementById("humidity").textContent = `${data.humidity}%`;
+        document.getElementById("windSpeed").textContent = `${Math.round(data.wind_speed)} mph`;
+
+        status.textContent = "";
+        card.classList.add("visible");
+      } catch (err) {
+        status.textContent = "";
+        errorMsg.textContent = err.message;
+      } finally {
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

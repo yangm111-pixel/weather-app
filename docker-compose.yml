@@ -1,0 +1,14 @@
+services:
+  weather-api:
+    build: ./backend
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+
+  weather-frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - weather-api
